@@ -31,7 +31,7 @@ public class Indexer extends SubsystemBase {
   // SmartDashboard
   final String indexerSpeed ="Index Speed";
   final String shootSpeed = "Shoot Speed";
-  final double SpeedIn = 0.5;
+  final double SpeedIndexer = 0.5;
   final double SpeedShoot = 0.75;
   private double setSpeed;
   //local variables
@@ -43,7 +43,6 @@ public class Indexer extends SubsystemBase {
   private boolean sens4Status;
   private boolean sens5Status;
   private boolean isIndexing;
-
   private int locationToStop;
 
   // Indexer
@@ -82,7 +81,7 @@ public class Indexer extends SubsystemBase {
   // Indexing the balls into the mag.
   // -------------------------------------------------------------
   private void IndexBalls() {
-    final double backup = SpeedIn;
+    final double backup = SpeedIndexer;
 
     // Get status of all the sensors inputs before indexer
     this.GetSensorStatus();
@@ -203,6 +202,13 @@ public class Indexer extends SubsystemBase {
       //Nothing
     }
     this.StopMotion();
+  }
+
+  //--------------------------------------------------------------
+  // This call as default command from the robot container
+  //--------------------------------------------------------------
+  public void SetDefaultCall() {
+
   }
 
   // -------------------------------------------------------------
