@@ -64,6 +64,11 @@ public class RobotContainer {
             m_driverController.getX(GenericHID.Hand.kRight), m_driverController.getX(GenericHID.Hand.kLeft)),
         m_driveTrain));
 
+        //default command for the indexer to run with the intake
+        m_indexer.setDefaultCommand(new RunCommand(
+          () -> m_indexer.SetDefaultCall(), m_indexer));
+
+
     // Configure the button bindings
     configureButtonBindings();
 
