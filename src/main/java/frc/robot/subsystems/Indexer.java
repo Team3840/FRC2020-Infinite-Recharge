@@ -4,7 +4,6 @@
 */
 package frc.robot.subsystems;
 
-import java.util.BitSet;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Preferences;
@@ -29,13 +28,13 @@ public class Indexer extends SubsystemBase {
   private final DigitalInput sensorInput5 = new DigitalInput(SensorContants.kSensorIndex5);
   
   // SmartDashboard
-  final String indexerSpeed ="Index Speed";
+  final String indexerSpeed = "Index Speed";
   final String shootSpeed = "Shoot Speed";
-  final double SpeedIndexer = 0.5;
-  final double SpeedShoot = 0.75;
+  final double SpeedIndexer = 0.2;
+  final double SpeedShoot = 0.2;
   private double setSpeed;
   //local variables
-  private BitSet senBitSet = new BitSet(6);
+  private final String [] snapShotSensors = new String[5];
   private boolean senIntakeStatus;
   private boolean sens1Status;
   private boolean sens2Status;
@@ -81,16 +80,17 @@ public class Indexer extends SubsystemBase {
   // Indexing the balls into the mag.
   // -------------------------------------------------------------
   private void IndexBalls() {
-    final double backup = SpeedIndexer;
+    double backup = SpeedIndexer;
 
     // Get status of all the sensors inputs before indexer
     this.GetSensorStatus();
-    // Get current speed setpoint from the preference tables
-    setSpeed = getPreferencesDouble(indexerSpeed, backup);
+    
     // If the indexer is full to move
-    if (!senBitSet.get(5)) {
+    if (!sens5Status) {
       // Finds Which location to stop
       this.WhichLocationToStop();
+      // Get current speed setpoint from the preference tables
+      setSpeed = getPreferencesDouble(indexerSpeed, backup);
       // Call the motor to move
       this.RunMotors(setSpeed);
       // Is the ball at the location?
@@ -107,20 +107,51 @@ public class Indexer extends SubsystemBase {
   private void GetSensorStatus() {
     // Fill the array with all the sensors inputs
     // 0 0 0 0 0
-    senBitSet.set(1,sensorInput1.get());  //Lowest Location
-    senBitSet.set(2,sensorInput2.get());
-    senBitSet.set(3,sensorInput3.get());
-    senBitSet.set(4,sensorInput4.get());
-    senBitSet.set(5,sensorInput5.get());  //Highest Location
+    // sensor 1
+    if (sensorInput1.get()) {
+      snapShotSensors[0] = "1";
+    }
+      else {
+        snapShotSensors[0] = "0";
+    }
 
-    // Display on the dashboard
-    SmartDashboard.putString("Sensor Input", senBitSet.toString());
+     // sensor 2
+     if (sensorInput2.get()) {
+      snapShotSensors[1] = "1";
+    }
+      else {
+        snapShotSensors[1] = "0";
+    }
+
+     // sensor 3
+     if (sensorInput3.get()) {
+      snapShotSensors[2] = "1";
+    }
+      else {
+        snapShotSensors[2] = "0";
+    }
+
+     // sensor 4
+     if (sensorInput4.get()) {
+      snapShotSensors[3] = "1";
+    }
+      else {
+        snapShotSensors[3] = "0";
+    }
+
+     // sensor 5
+     if (sensorInput5.get()) {
+      snapShotSensors[4] = "1";
+    }
+      else {
+        snapShotSensors[4] = "0";
+    }
   }
 
   // -------------------------------------------------------------
   // Runs the indexing motors until ball at location
   // -------------------------------------------------------------
-  private void RunMotors(final double speed) {
+  private void RunMotors(double speed) {
     indexerFront.set(speed);
     indexerBack.set(speed);
   }
@@ -129,19 +160,27 @@ public class Indexer extends SubsystemBase {
   //This monitors the sensor states and nofity which sensor we are we need to monitor
   // ----------------------------------------------------------------------------------
   private void WhichLocationToStop() {
-  
-    for (int x =0; x <6; x = x +1) {
-      if (!senBitSet.get(x)) {
-        locationToStop = x;
+   int intcounter = 1;
+   
+    for (String xLoc : snapShotSensors) {
+      System.out.println("Loc: " + intcounter + "L" + xLoc);
+      
+      //check the off sensor    
+      if (xLoc == "0") {
+        locationToStop = intcounter;
         break;
       }
+      //increment counter
+     intcounter = intcounter + 1;
     }
 
   }
 
   private void CheckBallLocation() {
+    System.out.println("Check Ball Location");
     switch (locationToStop) {
       case 1: this.StopLocation1();
+      System.out.println("Check Ball Location 1");
         break;
       case 2: this.StopLocation2();
         break;
@@ -158,9 +197,13 @@ public class Indexer extends SubsystemBase {
     // monitors to the ball location #1
     // -------------------------------------------------------------
     private void StopLocation1() {
-      while (sens1Status == false) {
-        //nothing
-      }
+      System.out.println("Stop Loc1");
+
+      do {
+        System.out.println("While Loc 1");
+      } while (sens1Status == false && sensorInput1.get() == false);
+
+      System.out.println("Loc1 Stop");
       this.StopMotion();
     }
   
@@ -170,6 +213,9 @@ public class Indexer extends SubsystemBase {
   private void StopLocation2() {
     while (sens2Status == false) {
       // Nothing
+      if (sens2Status == true) {
+        break;
+      }
     }
     this.StopMotion();
   }
@@ -180,6 +226,9 @@ public class Indexer extends SubsystemBase {
   private void StopLocation3() {
     while (sens3Status == false) {
       // Nothing
+      if (sens3Status == true) {
+        break;
+      }
     }
     this.StopMotion();
   }
@@ -190,6 +239,9 @@ public class Indexer extends SubsystemBase {
   private void StopLocation4() {
     while (sens4Status == false) {
       // Nothing
+      if (sens4Status == true) {
+        break;
+      }
     }
     this.StopMotion();
   }
@@ -200,6 +252,9 @@ public class Indexer extends SubsystemBase {
   private void StopLocation5() {
     while (sens5Status == false) {
       //Nothing
+      if (sens5Status == true) {
+        break;
+      }
     }
     this.StopMotion();
   }

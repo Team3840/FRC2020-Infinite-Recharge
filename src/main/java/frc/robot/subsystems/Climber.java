@@ -43,13 +43,13 @@ public class Climber extends SubsystemBase {
 
   private void Latch() {
     latchMotor.set(0.2);
-    wait(0.1);
+   // wait(0.1);
     latchMotor.set(0.0);
   }
 
   private void UnLatch() {
     latchMotor.set(-0.2);
-    wait(0.1);
+   //wait(0.1);
     latchMotor.set(0.0);
   }
 
